@@ -1,137 +1,57 @@
 # Remote - SSH: Fast Download
 
-Allows for fast download of files from a VSCode Remote SSH session.
+Allows for fast and efficient downloads of files and directories from a **VSCode Remote SSH** session to your local machine.
 
 ## Demo
+
 ![Demo](demo/demo.gif)
 
 ## Features
 
-This extension provides the following features:
-
 - **Fast File Downloads**: Quickly download files or directories from remote servers connected via SSH directly to your local machine.
-
-- **Multiple File Selection**: Supports downloading multiple files or directories at once.
-
-- **Rsync-Based Transfers**: Utilizes `rsync` for efficient and reliable synchronization between the remote server and your local machine.
-
-- **Automatic Rsync Version Check**: Ensures that `rsync` is installed and up-to-date on your local machine, providing guidance if updates are needed.
-
-- **Passwordless SSH Authentication Support**: Detects if passwordless SSH authentication is not set up and guides you through the setup process for a smoother experience.
+- **Multiple File Selection**: Supports downloading multiple files or directories simultaneously.
+- **Rsync-Based Transfers**: Utilizes `rsync` for optimized and reliable synchronization between remote servers and your local machine.
+- **Automatic Rsync Installation and Version Check**: Automatically checks if `rsync` is installed and up-to-date on your local machine, providing guidance for installation or updates.
+- **Passwordless SSH Authentication Detection**: Detects if passwordless SSH authentication is not set up and provides clear instructions for configuration.
 
 ## Benefits
 
-- **Speed and Efficiency**: `rsync` optimizes data transfer by only copying changes, making downloads faster, especially for large files or directories.
-
-- **Convenience**: Easily download files directly from the VSCode Explorer context menu without needing to switch to external tools like FileZilla.
-
-- **Security**: Encourages the use of SSH keys for passwordless authentication, enhancing security and reducing the hassle of entering passwords.
+- **Speed and Efficiency**: Uses `rsync`'s differential transfer capability, ensuring only changed files are copied, making downloads faster and more efficient.
+- **Seamless Workflow**: Download files directly from the **VSCode Explorer context menu** without switching to external tools like FileZilla.
+- **Enhanced Security**: Encourages the use of SSH keys for passwordless authentication, improving security while reducing the hassle of entering passwords.
 
 ## Requirements
 
-- **Visual Studio Code**: Version 1.60.0 or higher.
-
-- **Remote SSH Extension**: The official VSCode Remote - SSH extension to connect to remote servers.
-
-- **Rsync**: Installed on both the local and remote machines. On macOS, ensure that `rsync` version 3.0.0 or higher is installed, as the default version is outdated.
-
-- **SSH Configuration**: Passwordless SSH authentication set up using SSH keys.
+1. **Visual Studio Code**: Version **1.60.0** or higher.
+2. **Remote SSH Extension**: The official **VSCode Remote - SSH** extension for connecting to remote servers.
+3. **Rsync**: Installed on both the local and remote machines.
+   - **MacOS**: Ensure `rsync` version **3.0.0** or higher is installed (the default version on macOS is outdated).
+4. **Passwordless SSH Authentication**: Configure SSH key-based authentication for seamless operation.
 
 ## Installation
 
-### 1. Install Rsync on Your Local Machine
+### From the VSCode Marketplace
 
-#### macOS
+- Open **Visual Studio Code**.
+- Go to the **Extensions** view (`Ctrl+Shift+X` or `Cmd+Shift+X`).
+- Search for **"SSH Fast Download"** or **"compress-download-extension"**.
+- Click **Install**.
 
-- **Install Homebrew** (if not already installed):
+### Manual Installation
 
-  ```bash
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  ```
-
-- **Install rsync via Homebrew**:
-
-  ```bash
-  brew install rsync
-  ```
-
-- **Verify Installation**:
-
-  ```bash
-  rsync --version
-  ```
-
-  Ensure the version is **3.0.0** or higher.
-
-#### Linux
-
-- **Install rsync via apt-get**:
-
-  ```bash
-  sudo apt-get install rsync
-  ```
-
-- **Verify Installation**:
-
-  ```bash
-  rsync --version
-  ```
-
-  Ensure the version is **3.0.0** or higher.
-
-### 2. Set Up Passwordless SSH Authentication
-
-- **Generate an SSH Key Pair** (if you don't already have one):
-
-  ```bash
-  ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-  ```
-
-  - Press **Enter** to accept the default file location.
-  - Optionally, enter a passphrase for added security.
-
-- **Copy Your Public Key to the Remote Server**:
-
-  ```bash
-  ssh-copy-id username@remote_host
-  ```
-
-  Replace `username` and `remote_host` with your remote server's credentials.
-
-- **Test the SSH Connection**:
-
-  ```bash
-  ssh username@remote_host
-  ```
-
-  You should be able to log in without entering a password.
-
-### 3. Install the Extension
-
-- **From the Visual Studio Code Marketplace**:
-
-  - Open Visual Studio Code.
-  - Go to the **Extensions** view (`Ctrl+Shift+X` or `Cmd+Shift+X`).
-  - Search for **"SSH Fast Download"** or **"compress-download-extension"**.
-  - Click **"Install"**.
-
-- **Manual Installation**:
-
-  - If you have the `.vsix` file:
-    - Open Visual Studio Code.
-    - Go to the **Extensions** view.
-    - Click on the three-dot menu (`...`) in the top-right corner.
-    - Select **"Install from VSIX..."**.
-    - Choose the `.vsix` file you downloaded or packaged.
+- If you have the `.vsix` file:
+  - Open **Visual Studio Code**.
+  - Go to the **Extensions** view.
+  - Click on the three-dot menu (`...`) in the top-right corner.
+  - Select **"Install from VSIX..."**.
+  - Choose the `.vsix` file you downloaded or packaged.
 
 ## Usage
 
 1. **Connect to a Remote SSH Session**:
-
    - Use the **Remote - SSH** extension to connect to your remote server.
 
 2. **Download Files or Directories**:
-
    - In the **Explorer** view, select one or multiple files or directories.
    - Right-click on the selection.
    - Choose **"Fast Download"** from the context menu.
@@ -139,42 +59,27 @@ This extension provides the following features:
    - The extension will use `rsync` to transfer the selected items from the remote server to your local destination.
 
 3. **Monitor Progress**:
-
-   - The extension will display progress and output in the **"Compress Download"** output channel.
+   - The extension will display progress and output in the **"Fast Download"** output channel.
    - Notifications will inform you when the download is complete or if any errors occur.
 
 ## Extension Settings
 
-This extension currently does not add any VS Code settings.
+- **`fastDownload.defaultDownloadLocation`**:
+  - Allows you to set a default download directory on your local machine.
+  - Default: `""`.
 
 ## Known Issues
 
-- **Windows Support**: The extension currently does not support Windows as the local machine.
+1. **Windows Support**:
+   - The extension currently does not support Windows as the local machine.
 
-- **Rsync Version on macOS**: The default version of `rsync` on macOS is outdated. Ensure you install version **3.0.0** or higher via Homebrew.
+2. **Outdated Rsync on macOS**:
+   - The default version of `rsync` on macOS is outdated. Use Homebrew to install or update `rsync` to version **3.0.0** or higher.
 
-- **Passwordless SSH Authentication Required**: The extension requires passwordless SSH authentication to function properly. If not set up, the extension will guide you through the process.
-
-## Release Notes
-
-### 0.0.8
-
-- **Multiple File Selection Support**: You can now select and download multiple files or directories at once.
-
-- **Rsync Version Check**: The extension now checks if `rsync` is installed and up-to-date on your local machine, providing installation instructions if necessary.
-
-- **Passwordless SSH Authentication Detection**: The extension detects if passwordless SSH authentication is not set up and guides you to set it up.
-
-- **Improved Error Handling**: Enhanced feedback and error messages to assist users in troubleshooting.
-
-- **Simplified Workflow**: Removed the compression step in favor of `rsync`'s built-in capabilities for efficient file transfer.
-
-### 0.0.7
-
-- **Initial Release**: Introduced the ability to download compressed files and directories from remote SSH environments.
+3. **Passwordless SSH Authentication**:
+   - Passwordless SSH authentication is required for the extension to function properly. If not set up, the extension will guide you through the setup process.
 
 ## Contributing
-
 Contributions are welcome! Please submit issues or pull requests to the [GitHub repository](https://github.com/SamueleTorregrossa/vsc-download-compressed).
 
 ## License

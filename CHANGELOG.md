@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.16]
+### Added
+- Enhanced SSH Key Setup Instructions.
+- Improved Output Logs
+- Default Download Location Setting
+
 ## [0.0.15]
 ### Added
 - Added demo gif to README.md.
