@@ -1,4 +1,4 @@
-# Remote - SSH: Fast Download README
+# Remote - SSH: Fast Download
 
 Allows for fast download of files from a VSCode Remote SSH session.
 

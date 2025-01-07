@@ -38,7 +38,7 @@
           "supportsMultipleSelection": true
         }
       ]
-    ],
+    },
     "configuration": {
       "type": "object",
       "title": "Fast Download Configuration",
