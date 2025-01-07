@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { exec } from 'child_process';
 import * as path from 'path';
 import * as os from 'os';
+import * as fs from 'fs';
+import * as crypto from 'crypto';
 
 function checkRsyncVersion(minVersion: string): Promise<boolean> {
   return new Promise((resolve) => {
@@ -38,6 +40,61 @@ function compareVersions(v1: string, v2: string): number {
   return 0;
 }
 
+function installRsync(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let installCommand = '';
+    if (os.platform() === 'darwin') {
+      installCommand = 'brew install rsync';
+    } else if (os.platform() === 'linux') {
+      installCommand = 'sudo apt-get install -y rsync';
+    } else {
+      reject(new Error('Unsupported OS for automatic rsync installation.'));
+      return;
+    }
+
+    exec(installCommand, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`Failed to install rsync: ${stderr}`));
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+function generateSSHKeyPair(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const keyPath = path.join(os.homedir(), '.ssh', 'id_rsa');
+    if (fs.existsSync(keyPath)) {
+      resolve();
+      return;
+    }
+
+    exec(`ssh-keygen -t rsa -b 4096 -f ${keyPath} -N ""`, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`Failed to generate SSH key pair: ${stderr}`));
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+function copyPublicKeyToRemote(remoteName: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const publicKeyPath = path.join(os.homedir(), '.ssh', 'id_rsa.pub');
+    const remoteAuthorizedKeysPath = `${remoteName}:~/.ssh/authorized_keys`;
+
+    exec(`ssh-copy-id -i ${publicKeyPath} ${remoteName}`, (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(`Failed to copy public key to remote server: ${stderr}`));
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 export function activate(context: vscode.ExtensionContext) {
   const outputChannel = vscode.window.createOutputChannel("Fast Download");
 
@@ -55,18 +112,13 @@ export function activate(context: vscode.ExtensionContext) {
     const minRsyncVersion = '3.0.0'; // Minimum required version
     const rsyncVersionOk = await checkRsyncVersion(minRsyncVersion);
     if (!rsyncVersionOk) {
-      // Provide installation instructions based on OS
-      let installInstructions = '';
-      if (os.platform() === 'darwin') { // macOS
-        installInstructions = 'Install rsync via Homebrew:\n\nbrew install rsync';
-      } else if (os.platform() === 'linux') {
-        installInstructions = 'Install rsync via apt-get:\n\nsudo apt-get install rsync';
-      } else {
-        installInstructions = 'Please install rsync version 3.0.0 or higher.';
+      try {
+        await installRsync();
+        vscode.window.showInformationMessage('rsync has been successfully installed.');
+      } catch (error) {
+        vscode.window.showErrorMessage(error.message);
+        return;
       }
-
-      vscode.window.showErrorMessage(`rsync version ${minRsyncVersion} or higher is required.\n\n${installInstructions}`);
-      return;
     }
 
     // Prompt user to input the destination path, default to Downloads folder
@@ -88,6 +140,15 @@ export function activate(context: vscode.ExtensionContext) {
       return;
     }
     const remoteName = remoteNameMatch[1];
+
+    try {
+      await generateSSHKeyPair();
+      await copyPublicKeyToRemote(remoteName);
+      vscode.window.showInformationMessage('SSH key pair generated and public key copied to remote server.');
+    } catch (error) {
+      vscode.window.showErrorMessage(error.message);
+      return;
+    }
 
     // Construct remote file paths
     const remoteFiles = uriList.map(uri => {
