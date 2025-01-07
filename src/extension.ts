@@ -198,7 +198,24 @@ export function activate(context: vscode.ExtensionContext) {
                 "No"
               );
               if (choice === "Yes") {
-                const instructions = `
+                // Determine whether a local SSH key already exists
+                const localKeyPath = path.join(os.homedir(), ".ssh", "id_rsa");
+                let instructions: string;
+
+                if (fs.existsSync(localKeyPath)) {
+                  // Only show the steps for copying the key if it exists
+                  instructions = `
+SSH Key Setup Instructions
+--------------------------
+1) Copy your existing *public* key to the remote server:
+   ssh-copy-id -i ~/.ssh/id_rsa.pub ${remoteName}
+
+2) Verify by SSH’ing to the remote:
+   ssh ${remoteName}
+`;
+                } else {
+                  // Show the full steps, including key generation
+                  instructions = `
 SSH Key Setup Instructions
 --------------------------
 1) Generate a key pair (if you don't already have one):
@@ -210,6 +227,7 @@ SSH Key Setup Instructions
 3) Verify by SSH’ing to the remote:
    ssh ${remoteName}
 `;
+                }
 
                 // Show instructions in the output channel
                 outputChannel.clear();
