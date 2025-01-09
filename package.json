@@ -2,7 +2,7 @@
   "name": "compress-download-extension",
   "displayName": "Remote - SSH: Fast Download",
   "description": "A simple extension to more quickly download files from a remote server in VSCode.",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "publisher": "samueletorregrossa",
   "icon": "icon.png",
   "engines": {
@@ -38,13 +38,24 @@
           "supportsMultipleSelection": true
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Fast Download Configuration",
+      "properties": {
+        "fastDownload.defaultDownloadLocation": {
+          "type": "string",
+          "default": "",
+          "description": "Default location for downloaded files. eg. /Users/sam/Downloads"
+        }
+      }
     }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install"
+    "postinstall": "node ./node_modules/vscode/bin/install && node ./scripts/checkAndInstallRsync.js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
